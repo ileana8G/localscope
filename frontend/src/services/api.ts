@@ -24,3 +24,13 @@ export async function searchLocalities(
 
   return response.json();
 }
+
+export async function getLocality(siruta: number): Promise<Locality> {
+  const response = await fetch(`${API_URL}/api/v1/localities/${siruta}`);
+
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.status}`);
+  }
+
+  return response.json();
+}
