@@ -13,9 +13,11 @@ export type Locality = {
 export async function searchLocalities(
   query: string,
   limit = 20,
+  signal?: AbortSignal,
 ): Promise<Locality[]> {
   const response = await fetch(
     `${API_URL}/api/v1/localities/search?q=${encodeURIComponent(query)}&limit=${limit}`,
+    { signal },
   );
 
   if (!response.ok) {
