@@ -1,15 +1,11 @@
 from pydantic import BaseModel
 
 
-class LocalityResponse(BaseModel):
+class CountyResponse(BaseModel):
     id: int
-    siruta: int
     name: str
-    county: str
-    county_id: int | None = None
-    siruta_sup: int | None
-    locality_type: str | None
-    population: int | None
+    nuts3: str
+    nuts2: str
     latitude: float | None = None
     longitude: float | None = None
 

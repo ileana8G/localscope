@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getLocality, type Locality } from "../../services/api";
+import PlaceSections from "../../components/Place/PlaceSections";
 import LocalityHeader from "../../components/Locality/LocalityHeader";
+import {
+  getLocalityDashboard,
+  type PlaceDashboard,
+} from "../../services/api";
 
 export default function LocalityPage() {
   const { siruta } = useParams();
-  const [locality, setLocality] = useState<Locality | null>(null);
+  const [dashboard, setDashboard] = useState<PlaceDashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!siruta) return;
 
-    getLocality(Number(siruta))
-      .then(setLocality)
+    getLocalityDashboard(Number(siruta))
+      .then(setDashboard)
       .catch(() => setError("Nu am putut încărca localitatea."));
   }, [siruta]);
 
@@ -25,7 +29,7 @@ export default function LocalityPage() {
     );
   }
 
-  if (!locality) {
+  if (!dashboard) {
     return (
       <main>
         <p>Se încarcă...</p>
@@ -33,26 +37,52 @@ export default function LocalityPage() {
     );
   }
 
+  const place = dashboard.place;
+  const locality = {
+    id: Number(place.id),
+    siruta: Number(place.siruta),
+    name: String(place.name),
+    county: String(place.county),
+    county_id: null,
+    siruta_sup: null,
+    locality_type: (place.locality_type as string | null) ?? null,
+    population: (place.population as number | null) ?? null,
+    latitude: (place.latitude as number | null) ?? null,
+    longitude: (place.longitude as number | null) ?? null,
+  };
+
   return (
     <main>
       <Link to="/">← Înapoi la căutare</Link>
 
       <LocalityHeader locality={locality} />
 
-      <section>
-        <h2>Date generale</h2>
+      {place.county_nuts3 ? (
+        <p>
+          <Link to={`/county/${place.county_nuts3}`}>
+            Vezi județul {String(place.county)}
+          </Link>
+        </p>
+      ) : null}
 
-        <dl>
-          <dt>SIRUTA</dt>
-          <dd>{locality.siruta}</dd>
-
-          <dt>Tip localitate</dt>
-          <dd>{locality.locality_type ?? "—"}</dd>
-
-          <dt>Populație</dt>
-          <dd>{locality.population?.toLocaleString("ro-RO") ?? "—"}</dd>
-        </dl>
-      </section>
+      <PlaceSections
+        dashboard={dashboard}
+        general={
+          <section>
+            <h2>Date generale</h2>
+            <dl>
+              <dt>SIRUTA</dt>
+              <dd>{locality.siruta}</dd>
+              <dt>Tip localitate</dt>
+              <dd>{locality.locality_type ?? "—"}</dd>
+              <dt>Populație</dt>
+              <dd>
+                {locality.population?.toLocaleString("ro-RO") ?? "—"}
+              </dd>
+            </dl>
+          </section>
+        }
+      />
     </main>
   );
 }

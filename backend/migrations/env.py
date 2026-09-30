@@ -19,7 +19,7 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 from backend.app.db.database import Base
-from backend.app.models.locality import Locality
+from backend.app.models import AqStation, County, Indicator, IndicatorValue, Locality  # noqa: F401
 
 target_metadata = Base.metadata
 

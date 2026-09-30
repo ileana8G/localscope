@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from backend.app.db.database import get_db
 from backend.app.models.locality import Locality
 from backend.app.schemas.locality import LocalityResponse
+from backend.app.services.dashboard import build_locality_dashboard
 
 router = APIRouter(
     prefix="/api/v1/localities",
@@ -26,7 +27,6 @@ def get_localities(
     )
 
     return db.scalars(statement).all()
-
 
 
 @router.get("/search", response_model=list[LocalityResponse])
@@ -54,7 +54,6 @@ def get_locality(
     locality = db.scalar(statement)
 
     if locality is None:
-
         raise HTTPException(
             status_code=404,
             detail="Locality not found",
@@ -62,3 +61,10 @@ def get_locality(
 
     return locality
 
+
+@router.get("/{siruta}/dashboard")
+def get_locality_dashboard(siruta: int, db: Session = Depends(get_db)):
+    dashboard = build_locality_dashboard(db, siruta)
+    if dashboard is None:
+        raise HTTPException(status_code=404, detail="Locality not found")
+    return dashboard
